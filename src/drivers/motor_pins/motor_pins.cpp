@@ -31,9 +31,9 @@
 #define DIR3 9   // Controls direction of stepper 3
 #define nENBL 10 // Enables/disables all 3 stepper motors
 
-extern uint16_t STEP_LEVEL = 32750;
-extern uint16_t WRAP_LEVEL = 65500;
-extern uint STOP_LEVEL = 0;
+ uint16_t STEP_LEVEL = 32750;
+ uint16_t WRAP_LEVEL = 65500;
+ uint STOP_LEVEL = 0;
 
 // Define the global variables for the PWM slices here
 uint slice_num_STEP1;  // Define these variables
@@ -139,4 +139,31 @@ void move_forward()
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
     pwm_set_chan_level(slice_num_STEP2, PWM_CHAN_B, STEP_LEVEL);
     pwm_set_chan_level(slice_num_STEP3, PWM_CHAN_B, STEP_LEVEL);
+}
+
+void turn_left() {
+    // Set directions for left turn
+    gpio_put(DIR1, 1); // Y-axis stepper (DIR1) moves backward
+    gpio_put(DIR2, 0); // X-axis stepper (DIR2) moves forward
+
+    // Set the step level for each stepper motor to turn left
+    pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
+    pwm_set_chan_level(slice_num_STEP2, PWM_CHAN_B, STEP_LEVEL);
+}
+
+void turn_right() {
+    // Set directions for right turn
+    gpio_put(DIR1, 0); // Y-axis stepper (DIR1) moves forward
+    gpio_put(DIR2, 1); // X-axis stepper (DIR2) moves backward
+
+    // Set the step level for each stepper motor to turn right
+    pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
+    pwm_set_chan_level(slice_num_STEP2, PWM_CHAN_B, STEP_LEVEL);
+}
+
+void stop_motors() {
+    // Stop all stepper motors by setting the step level to 0
+    pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STOP_LEVEL);
+    pwm_set_chan_level(slice_num_STEP2, PWM_CHAN_B, STOP_LEVEL);
+    pwm_set_chan_level(slice_num_STEP3, PWM_CHAN_B, STOP_LEVEL);
 }

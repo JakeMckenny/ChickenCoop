@@ -18,6 +18,16 @@ int main()
     for (;;)
     {
         move_backward();
+        sleep_ms(2000);
+        stop_motors();
+        sleep_ms(2000);
+        move_forward();
+        sleep_ms(2000);
+        stop_motors();
+        sleep_ms(2000);
+        turn_left();
+        sleep_ms(2000);
+        turn_right();
     }
     return 0;
 }

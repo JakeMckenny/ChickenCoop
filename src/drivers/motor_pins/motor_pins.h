@@ -8,3 +8,9 @@ void initialize_stepper_motor();
 void move_forward();
 
 void move_backward();
+
+void turn_right();
+
+void turn_left();
+
+void stop_motors();
