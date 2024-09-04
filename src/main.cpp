@@ -4,8 +4,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
-#include <string>
-
+ //hello jako
 using namespace cv;
 
 int main()
