@@ -15,3 +15,7 @@
 #define DECAY 8  // CURRENTLY UNUSED
 #define DIR3 9   // Controls direction of stepper 3
 #define nENBL 10 // Enables/disables all 3 stepper motors
+
+// This is fo ultrasonic sensor
+// #define TRIG_PIN (find pin)   // GPIO pin connected to TRIG of HC-SR04
+// #define ECHO_PIN  (find pin)  // GPIO pin connected to ECHO of HC-SR04
