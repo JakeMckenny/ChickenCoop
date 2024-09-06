@@ -116,10 +116,9 @@ void initialize_stepper_motor()
 
 void move_backward()
 {
-    // Set directions for forward movement
+    // Set directions for backwards movement
     gpio_put(DIR1, 1); // Forward direction for Y-axis stepper
-    gpio_put(DIR2, 1); // Forward direction for X-axis stepper
-    gpio_put(DIR3, 1); // Forward direction for Z-axis stepper
+    gpio_put(DIR2, 0); // Forward direction for X-axis stepper
 
     // Set the step level for each stepper motor to move forward
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
@@ -132,8 +131,7 @@ void move_forward()
 {
     // Set directions for forward movement
     gpio_put(DIR1, 0); // Forward direction for Y-axis stepper
-    gpio_put(DIR2, 0); // Forward direction for X-axis stepper
-    gpio_put(DIR3, 0); // Forward direction for Z-axis stepper
+    gpio_put(DIR2, 1); // Forward direction for X-axis stepper
 
     // Set the step level for each stepper motor to move forward
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
@@ -144,7 +142,7 @@ void move_forward()
 void turn_left() {
     // Set directions for left turn
     gpio_put(DIR1, 1); // Y-axis stepper (DIR1) moves backward
-    gpio_put(DIR2, 0); // X-axis stepper (DIR2) moves forward
+    gpio_put(DIR2, 1); // X-axis stepper (DIR2) moves forward
 
     // Set the step level for each stepper motor to turn left
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
@@ -154,7 +152,7 @@ void turn_left() {
 void turn_right() {
     // Set directions for right turn
     gpio_put(DIR1, 0); // Y-axis stepper (DIR1) moves forward
-    gpio_put(DIR2, 1); // X-axis stepper (DIR2) moves backward
+    gpio_put(DIR2, 0); // X-axis stepper (DIR2) moves backward
 
     // Set the step level for each stepper motor to turn right
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);

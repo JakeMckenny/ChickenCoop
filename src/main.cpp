@@ -17,17 +17,13 @@ int main()
     initialize_stepper_motor();
     for (;;)
     {
-        move_backward();
-        sleep_ms(2000);
-        stop_motors();
-        sleep_ms(2000);
-        move_forward();
-        sleep_ms(2000);
-        stop_motors();
-        sleep_ms(2000);
-        turn_left();
-        sleep_ms(2000);
-        turn_right();
-    }
+            for (int i = 0; i < 5; i++) { 
+      // First loop (right loop)
+        move_forward();  // Move forward
+        sleep_ms(10000);   // Adjust timing for forward movement
+        turn_right();    // Make a pronounced right turn
+        sleep_ms(3000);   // Increase sleep time to make a sharp turn
+            }
+}
     return 0;
 }
