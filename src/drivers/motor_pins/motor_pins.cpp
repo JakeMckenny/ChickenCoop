@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "hardware/irq.h"
-
 #include "WS2812.pio.h" // This header file gets produced during compilation from the WS2812.pio file
 #include "drivers/logging/logging.h"
 #include "drivers/motor_pins/motor_pins.h"
@@ -27,8 +26,6 @@
 #define nRESET 18
 #define DECAY 8  // CURRENTLY UNUSED
 #define nENBL 10 // Enables/disables all 3 stepper motors
-#define UART_TX_PIN 0
-#define UART_RX_PIN 1
 
 uint16_t STEP_LEVEL = 32750;
 uint16_t WRAP_LEVEL = 65500;
@@ -127,8 +124,8 @@ void move_forward(){
 
 void turn_left(){
     // Set directions for left turn
-    gpio_put(DIR1, 1); // Y-axis stepper (DIR1) moves backward
-    gpio_put(DIR2, 1); // X-axis stepper (DIR2) moves forward
+    gpio_put(DIR1, 0); // Y-axis stepper (DIR1) moves backward
+    gpio_put(DIR2, 0); // X-axis stepper (DIR2) moves forward
 
     // Set the step level for each stepper motor to turn left
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
@@ -137,8 +134,8 @@ void turn_left(){
 
 void turn_right(){
     // Set directions for right turn
-    gpio_put(DIR1, 0); // Y-axis stepper (DIR1) moves forward
-    gpio_put(DIR2, 0); // X-axis stepper (DIR2) moves backward
+    gpio_put(DIR1, 1); // Y-axis stepper (DIR1) moves forward
+    gpio_put(DIR2, 1); // X-axis stepper (DIR2) moves backward
 
     // Set the step level for each stepper motor to turn right
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);

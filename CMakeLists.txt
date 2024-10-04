@@ -33,6 +33,7 @@ if(CrossCompiling)
         src/main.cpp
         src/drivers/logging/logging.cpp
         src/drivers/motor_pins/motor_pins.cpp
+        src/drivers/uart/uart.cpp
     )
     target_include_directories(labs
         PUBLIC 
