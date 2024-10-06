@@ -22,6 +22,7 @@
 #define STOP_BITS 1
 #define PARITY    UART_PARITY_NONE
 
+
 // Function for RX interrupt handler.
 void on_uart_rx(void) {
     while (uart_is_readable(UART_ID)) {
@@ -51,6 +52,7 @@ void on_uart_rx(void) {
         }
     }
 }
+
 
 // Function to initialize UART communication.
 void initialize_uart(){
@@ -82,3 +84,56 @@ void initialize_uart(){
     // Now enable the UART to send interrupts - RX only
     uart_set_irq_enables(UART_ID, true, false);
 }
+
+
+// Function to reset the buffer used in the interrupt handler.
+void reset_buffer(){
+    // Empty the buffer
+    for (size_t i = 0; i < 100; i++){
+        buffer[i] = '\000';
+    }
+    input_ready = false;  // This will put the pico back in low power mode. ie: it will go back into the 'while (!input_ready)' loop until another character is recieved over uart.
+    ind = 0;              // Set the index for the buffer back to zero.
+}
+
+
+// Function to read movement requests sent over UART and action the movement requests.
+void movement_command(){
+    // Code that runs when character is detected over UART:
+    if (sscanf((char *) buffer, "%c", &direction) == 1){ 
+        switch (direction){
+            case 'w': // Move forward.
+            move_forward();
+            printf("MOVING FORWARD...\r\n");
+            break;
+
+            case 'x': // Move backward.
+            move_backward();
+            printf("MOVING BACKWARD...\r\n");
+            break;
+
+            case 'a': // Turn left.
+            turn_left();
+            printf("TURNING LEFT...\r\n");
+            break;
+
+            case 'd': // Turn right.
+            turn_right();
+            printf("TURNING RIGHT...\r\n");
+            break;
+
+            case 's': // Stop.
+            stop_motors();
+            printf("STOP...\r\n");
+            break;
+
+            // If a key is pressed that isn't defined, then display an error.
+            default:
+            printf("ERROR: Invalid key.\r\n");
+        }
+    }
+}
+
+
+
+
