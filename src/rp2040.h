@@ -17,7 +17,3 @@
 #define nENBL 10 // Enables/disables all 3 stepper motors
 #define UART_TX_PIN 0
 #define UART_RX_PIN 1
-
-// This is fo ultrasonic sensor
-// #define TRIG_PIN (find pin)   // GPIO pin connected to TRIG of HC-SR04
-// #define ECHO_PIN  (find pin)  // GPIO pin connected to ECHO of HC-SR04

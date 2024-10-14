@@ -12,20 +12,49 @@
 #include "drivers/motor_pins/motor_pins.h"
 #include "rp2040.h"
 
-// Define the GPIO pins for the motors
-#define DIR1 22  // Direction for Y-axis stepper
-#define DIR2 20  // Direction for X-axis stepper
-#define STEP1 21 // Movement for Y-axis stepper
-#define STEP2 19 // Movement for X-axis stepper
-#define MODE0 12 // MODE0, MODE1, and MODE2 control the step size of the stepper motors
-#define MODE1 13
-#define MODE2 14
-#define nHOME 15  // CURRENTLY UNUSED
-#define nFAULT 16 // CURRENTLY UNUSED
-#define nSLEEP 17 // Enables/disables sleep mode of all 3 stepper motors
-#define nRESET 18
-#define DECAY 8  // CURRENTLY UNUSED
-#define nENBL 10 // Enables/disables all 3 stepper motors
+// // Define the GPIO pins for the motors (CC2511 BOARD)
+// #define DIR1 22  // Direction for Y-axis stepper
+// #define DIR2 20  // Direction for X-axis stepper
+// #define STEP1 21 // Movement for Y-axis stepper
+// #define STEP2 19 // Movement for X-axis stepper
+// #define MODE0 12 // MODE0, MODE1, and MODE2 control the step size of the stepper motors
+// #define MODE1 13
+// #define MODE2 14
+// #define nHOME 15  // CURRENTLY UNUSED
+// #define nFAULT 16 // CURRENTLY UNUSED
+// #define nSLEEP 17 // Enables/disables sleep mode of all 3 stepper motors
+// #define nRESET 18
+// #define DECAY 8  // CURRENTLY UNUSED
+// #define nENBL 10 // Enables/disables all 3 stepper motors
+
+// Define the GPIO pins for the motors (CC3501 BOARD)
+#define Accel_SCL_SCLK 2
+#define Accel_SDA_MOSI 3
+#define Accel_MISO 4
+#define Accel_CS 5
+#define Accel_Int1 6
+#define Accel_Int2 7
+#define UART1_TX 8
+#define UART1_RX 9
+#define UART1_CTS 10
+#define UART1_RTS 11
+#define RESET 12
+#define TRIG 13
+#define ECHO3V3 14
+#define STEP2 15 // Movement for X-axis stepper
+#define DIR2 18  // Direction for X-axis stepper
+#define nENBL 19 // Enables/disables all 3 stepper motors
+#define DIR1 20  // Direction for Y-axis stepper
+#define DECAY 21  // CURRENTLY UNUSED
+#define nSLEEP 22 // Enables/disables sleep mode of all 3 stepper motors
+#define nRESET 23
+#define MODE2 24
+#define MODE1 25
+#define MODE0 26 // MODE0, MODE1, and MODE2 control the step size of the stepper motors
+#define STEP1 27 // Movement for Y-axis stepper
+
+
+
 
 uint16_t STEP_LEVEL = 32750;
 uint16_t WRAP_LEVEL = 65500;
@@ -103,8 +132,8 @@ void initialize_stepper_motor(){
 
 void move_backward(){
     // Set directions for backwards movement
-    gpio_put(DIR1, 1); // Backward direction for Y-axis stepper
-    gpio_put(DIR2, 0); // Backward direction for X-axis stepper
+    gpio_put(DIR1, 0); // Backward direction for Y-axis stepper
+    gpio_put(DIR2, 1); // Backward direction for X-axis stepper
 
     // Set the step level for each stepper motor to move backward
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
@@ -114,8 +143,8 @@ void move_backward(){
 // Function to move forward (no inputs needed)
 void move_forward(){
     // Set directions for forward movement
-    gpio_put(DIR1, 0); // Forward direction for Y-axis stepper
-    gpio_put(DIR2, 1); // Forward direction for X-axis stepper
+    gpio_put(DIR1, 1); // Forward direction for Y-axis stepper
+    gpio_put(DIR2, 0); // Forward direction for X-axis stepper
 
     // Set the step level for each stepper motor to move forward
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);

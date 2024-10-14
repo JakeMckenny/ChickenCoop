@@ -1,3 +1,18 @@
+// Values for UART communication:
+
+// #define UART_TX_PIN 0 // UART PIN FOR DEBUGGER
+// #define UART_RX_PIN 1 // UART PIN FOR DEBUGGER
+// #define UART_ID uart0 // UART ID FOR DEBUGGER
+
+#define UART_TX_PIN 8 // UART PIN FOR BLUETOOTH
+#define UART_RX_PIN 9 // UART PIN FOR BLUETOOTH
+#define UART_ID uart1 // UART ID FOR BLUETOOTH
+
+#define BAUD_RATE 115200
+#define DATA_BITS 8
+#define STOP_BITS 1
+#define PARITY    UART_PARITY_NONE
+
 // Declare external global variables for use in the interrupt handler (this is required since we update these variables in the main code).
 extern volatile bool input_ready;      
 extern volatile unsigned int ind;      
