@@ -53,9 +53,6 @@
 #define MODE0 26 // MODE0, MODE1, and MODE2 control the step size of the stepper motors
 #define STEP1 27 // Movement for Y-axis stepper
 
-
-
-
 uint16_t STEP_LEVEL = 32750;
 uint16_t WRAP_LEVEL = 65500;
 uint STOP_LEVEL = 0;
@@ -132,8 +129,8 @@ void initialize_stepper_motor(){
 
 void move_backward(){
     // Set directions for backwards movement
-    gpio_put(DIR1, 0); // Backward direction for Y-axis stepper
-    gpio_put(DIR2, 1); // Backward direction for X-axis stepper
+    gpio_put(DIR1, 1); // Backward direction for Y-axis stepper
+    gpio_put(DIR2, 0); // Backward direction for X-axis stepper
 
     // Set the step level for each stepper motor to move backward
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
@@ -143,8 +140,8 @@ void move_backward(){
 // Function to move forward (no inputs needed)
 void move_forward(){
     // Set directions for forward movement
-    gpio_put(DIR1, 1); // Forward direction for Y-axis stepper
-    gpio_put(DIR2, 0); // Forward direction for X-axis stepper
+    gpio_put(DIR1, 0); // Forward direction for Y-axis stepper
+    gpio_put(DIR2, 1); // Forward direction for X-axis stepper
 
     // Set the step level for each stepper motor to move forward
     pwm_set_chan_level(slice_num_STEP1, PWM_CHAN_B, STEP_LEVEL);
