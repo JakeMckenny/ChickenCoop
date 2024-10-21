@@ -1,39 +1,3 @@
-// #include <stdio.h>
-// #include "pico/stdlib.h"
-// #include "hardware/gpio.h"
-// #include "hardware/pio.h"
-// #include "hardware/pwm.h"
-// #include "hardware/adc.h"
-// #include <stdio.h>
-// #include <string.h>
-// #include "hardware/irq.h"
-// #include "rp2040.h"
-// #include "WS2812.pio.h"
-// #include "drivers/logging/logging.h"
-// #include "drivers/motor_pins/motor_pins.h"
-// #include "drivers/uart/uart.h"
-
-// volatile bool input_ready = false;
-// volatile char buffer [100] = {};
-// volatile unsigned int ind = 0; // initial value => buffer is empty
-// char direction;
-
-// int main(){
-//     stdio_init_all();
-//     initialize_stepper_motor();
-//     initialize_uart();
-//     // NOTE: Using this 'initialize_uart()' function sets up the interrupt handler so that it is
-//     // automatically called when a character is detected. The interesting thing is that we don't
-//     // even need to declare the interrupt handler in the main file at all. It now recognises to
-//     // use the interrupt handler function from the driver file when a character is recieved over UART.
-
-//     while (true){
-//         while (!input_ready){}
-//         movement_command();
-//         reset_buffer();
-//     }
-// }
-
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
@@ -43,91 +7,78 @@
 #include <stdio.h>
 #include <string.h>
 #include "hardware/irq.h"
-#include "rp2040.h"
 #include "WS2812.pio.h"
 #include "drivers/logging/logging.h"
 #include "drivers/motor_pins/motor_pins.h"
 #include "drivers/uart/uart.h"
+#include "drivers/ultrasonic/ultrasonic.h"
 #include <iostream>
+#include <pico/time.h>
+#include "drivers/LIS3DH/LIS3DH.h"
 
+// Define namespace.
 using namespace std;
-#define TRIG 13
-#define ECHO3V3 14
-#define DISTANCE_THRESHOLD 16 // Distance threshold in centimeters
 
+// Define variables.
 volatile uint32_t rise_time = 0;
 volatile uint32_t fall_time = 0;
 volatile bool trig_pulse_complete = false;
 float distance_cm = DISTANCE_THRESHOLD + 1; // Initialise distance_cm so that it is greater than the threshold value.
-
-void gpio_callback(uint gpio, uint32_t events){
-    if (gpio == ECHO3V3)
-    { // Change to EchoPin for the callback
-        if (events & GPIO_IRQ_EDGE_RISE) {
-            rise_time = time_us_32();
-        }
-
-        if (events & GPIO_IRQ_EDGE_FALL)
-        {
-
-            fall_time = time_us_32();
-
-            trig_pulse_complete = true; // Signal that the pulse is complete
-        }
-    }
-}
-
-void measure_trig_pulse_duration()
-{
-    gpio_init(TRIG);
-    gpio_set_dir(TRIG, GPIO_OUT);
-    gpio_put(TRIG, 0);
-    sleep_ms(2); // Ensure a stable state
-    gpio_put(TRIG, 1);
-    sleep_us(10); // 10 microseconds pulse
-    gpio_put(TRIG, 0);
-    // Set up the EchoPin as input
-    gpio_init(ECHO3V3);
-    gpio_set_dir(ECHO3V3, GPIO_IN);
-    gpio_set_irq_enabled_with_callback(ECHO3V3, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
-    while (!trig_pulse_complete)
-    {
-        tight_loop_contents(); // Wait for the pulse to complete
-    }
-    trig_pulse_complete = false; // Reset for the next measurement
-}
-
 volatile bool input_ready = false;
 volatile char buffer[100] = {};
 volatile unsigned int ind = 0; // initial value => buffer is empty
 char direction;
+bool obstacle_flag = false;
+absolute_time_t start_time, end_time;
+char prev_command;
+int16_t x;
+int16_t y;
+int16_t z;
 
 int main(){
     stdio_init_all();
     initialize_stepper_motor();
     initialize_uart();
-    // NOTE: Using this 'initialize_uart()' function sets up the interrupt handler so that it is
-    // automatically called when a character is detected. The interesting thing is that we don't
-    // even need to declare the interrupt handler in the main file at all. It now recognises to
-    // use the interrupt handler function from the driver file when a character is recieved over UART.
+    initialize_bluetooth();
+    initialize_ultrasonic();
+    LIS3DH_init();
+
+    // Define initial starting time.
+    start_time = get_absolute_time();
 
     while (true){
         while (!input_ready){
-            measure_trig_pulse_duration();
-            sleep_ms(100); // Wait a bit before taking the next measurement
-            // Calculate distance after the pulse is complete
-            uint32_t time_diff_us = fall_time - rise_time;     // Calculate time difference
-            distance_cm = (time_diff_us / 2.0) * 0.0343; // Distance in cm
-            // Control the LED based on distance
-            if (distance_cm < DISTANCE_THRESHOLD){
-                stop_motors();
+            // Send data over UART if half a second has passed.
+            end_time = get_absolute_time(); // Get current time.
+            int64_t time_diff_ms = (absolute_time_diff_us(start_time, end_time)) * 0.001; // Determine time difference.
+            if (time_diff_ms >= 500){
+                measure_trig_pulse_duration(); // Send the ultrasonic sensor data over UART.
+                send_accel_readings(); // Also send the accelerometer readings over UART.
+                start_time = get_absolute_time(); // Reset timer.
             }
-            else{}
-            sleep_ms(500); // Adjust timing as needed
+           
+           // Stop movement of the coop if an object detected by the ultrasonic sensor is within the distance threshold.
+           if (distance_cm < DISTANCE_THRESHOLD){
+                stop_motors();
+                if (obstacle_flag == false){
+                    printf("OBSTACLE DETECTED!\r\n");
+                }
+                obstacle_flag = true;
+            }
+           
+           // Once obstacle is cleared, continue with previous movement command.
+           if (obstacle_flag == true && distance_cm >= DISTANCE_THRESHOLD){
+                prev_movement_command();
+                obstacle_flag = false;
+            }
         }
+
+        // Only interpret movement commands if there are no obstacles within the distance threshold of the ultrasonic sensor.
         if (distance_cm >= DISTANCE_THRESHOLD){
             movement_command();
-            reset_buffer();
         }
+
+        // Reset buffer for UART communication.
+        reset_buffer();
     }
 }

@@ -34,6 +34,8 @@ if(CrossCompiling)
         src/drivers/logging/logging.cpp
         src/drivers/motor_pins/motor_pins.cpp
         src/drivers/uart/uart.cpp
+        src/drivers/ultrasonic/ultrasonic.cpp
+        src/drivers/LIS3DH/LIS3DH.cpp
     )
     target_include_directories(labs
         PUBLIC 

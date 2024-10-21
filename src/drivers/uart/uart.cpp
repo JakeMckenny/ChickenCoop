@@ -10,7 +10,6 @@
 #include "WS2812.pio.h" // This header file gets produced during compilation from the WS2812.pio file
 #include "drivers/logging/logging.h"
 #include "drivers/motor_pins/motor_pins.h"
-#include "rp2040.h"
 #include "drivers/uart/uart.h"
 
 // Function for RX interrupt handler.
@@ -43,7 +42,6 @@ void on_uart_rx(void) {
     }
 }
 
-
 // Function to initialize UART communication.
 void initialize_uart(){
     // Set up our UART with a basic baud rate.
@@ -75,7 +73,6 @@ void initialize_uart(){
     uart_set_irq_enables(UART_ID, true, false);
 }
 
-
 // Function to reset the buffer used in the interrupt handler.
 void reset_buffer(){
     // Empty the buffer
@@ -95,35 +92,86 @@ void movement_command(){
             case 'w': // Move forward.
             move_forward();
             printf("MOVING FORWARD...\r\n");
+            prev_command = 'w';
             break;
 
             case 'x': // Move backward.
             move_backward();
             printf("MOVING BACKWARD...\r\n");
+            prev_command = 'x';
             break;
 
             case 'a': // Turn left.
             turn_left();
             printf("TURNING LEFT...\r\n");
+            prev_command = 'a';
             break;
 
             case 'd': // Turn right.
             turn_right();
             printf("TURNING RIGHT...\r\n");
+            prev_command = 'd';
             break;
 
             case 's': // Stop.
             stop_motors();
             printf("STOP...\r\n");
+            prev_command = 's';
             break;
 
             // If a key is pressed that isn't defined, then display an error.
             default:
             printf("ERROR: Invalid key.\r\n");
+            printf("%s\r\n", buffer);
         }
     }
 }
 
+// Function to initialize bluetooth communication.
+void initialize_bluetooth(){
+    printf("Starting Bluetooth connection process...\r\n");
+    // Enter command mode on RN4871 bluetooth module.
+    uart_puts(UART_ID, "$$$");
+    sleep_ms(1000);
+    // Turn echo on.
+    uart_puts(UART_ID, "+\n");
+    sleep_ms(1000);
+    // Connect to last bonded device.
+    uart_puts(UART_ID, "C\n");
+    // Allow adequate time for bluetooth connection.
+    sleep_ms(5000);
+    // Exit command mode on RN4871 bluetooth module.
+    uart_puts(UART_ID, "---");
+    sleep_ms(1000);
+    printf("Bluetooth connection process complete.\r\n");
+}
 
+// Function to resume previous movement command.
+void prev_movement_command(){
+    switch (prev_command){
+        case 'w': // Move forward.
+        move_forward();
+        printf("MOVING FORWARD...PREV COMMAND\r\n");
+        break;
 
+        case 'x': // Move backward.
+        move_backward();
+        printf("MOVING BACKWARD...PREV COMMAND\r\n");
+        break;
 
+        case 'a': // Turn left.
+        turn_left();
+        printf("TURNING LEFT...PREV COMMAND\r\n");
+        break;
+
+        case 'd': // Turn right.
+        turn_right();
+        printf("TURNING RIGHT...PREV COMMAND\r\n");
+        break;
+
+        case 's': // Stop.
+        stop_motors();
+        printf("STOP...PREV COMMAND\r\n");
+        break;
+    }
+}
